@@ -62,12 +62,13 @@ def login(request):
         for user in users:
             if bcrypt.checkpw(pw.encode(), user.pw.encode()):
                 request.session['login_email'] = ''
-                return redirect(reverse('login:success', args=(user.id,)))
+                request.session['id'] = user.id
+                return redirect(reverse('login:success'))
         messages.error(request, 'Wrong email/password combination!')
         return redirect(reverse('login:index'))
     else:
         return redirect(reverse('login:index'))
 
-def success(request, id):
-    context = {'first_name': User.objects.get(id=id).first_name}
+def success(request):
+    context = {'first_name': User.objects.get(id=request.session['id']).first_name}
     return render(request, 'login/success.html', context)
