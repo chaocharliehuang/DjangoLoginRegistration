@@ -18,16 +18,16 @@ class UserManager(models.Manager):
         request.session['last_name'] = last_name
         request.session['email'] = email
 
-        error = {}
+        errors = {}
         if len(first_name) < 2 or len(last_name) < 2 or not first_name.isalpha() or not last_name.isalpha():
             errors['names'] = 'First and last names must be at least 2 characters and only contain letters!'
         
-        if len(post_data['email']) < 1:
+        if len(email) < 1:
             errors['email'] = 'Email cannot be blank!'
-        elif not EMAIL_REGEX.match(post_data['email']):
+        elif not EMAIL_REGEX.match(email):
             errors['email'] = 'Invalid email address!'
         
-        if len(post_data['pw']) < 8:
+        if len(pw) < 8:
             errors['pw'] = 'Password must be at least 8 characters!'
         
         if pw != pw_confirm:
