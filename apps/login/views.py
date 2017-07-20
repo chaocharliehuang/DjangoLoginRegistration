@@ -37,6 +37,31 @@ def register(request):
     else:
         return redirect(reverse('login:index'))
 
+def login(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        pw = request.POST['pw']
+        request.session['login_email'] = email
+
+        # FORM VALIDATION
+        if len(email) < 1 or len(pw) < 1:
+            messages.error(request, 'Email and/or password fields cannot be blank!')
+            return redirect(reverse('login:index'))
+        
+        # USER LOGIN
+        users = User.objects.filter(email=email)
+        if len(users) < 1:
+            messages.error(request, 'No user with that email!')
+            return redirect(reverse('login:index'))
+        for user in users:
+            if bcrypt.checkpw(pw.encode(), user.pw.encode()):
+                request.session['login_email'] = ''
+                return redirect(reverse('login:success', args=(user.id,)))
+        messages.error(request, 'Wrong email/password combination!')
+        return redirect(reverse('login:index'))
+    else:
+        return redirect(reverse('login:index'))
+
 def success(request, id):
     context = {'first_name': User.objects.get(id=id).first_name}
     return render(request, 'login/success.html', context)
