@@ -24,6 +24,12 @@ def register(request):
                 messages.error(request, error, extra_tags=tag)
             return redirect(reverse('login:index'))
 
+        # CHECK IF EMAIL IS ALREADY IN DATABASE
+        found_users = User.objects.filter(email=request.POST['email'])
+        if found_users.count() > 0:
+            messages.error(request, 'Email already taken', extra_tags='email')
+            return redirect(reverse('login:index'))
+
         # ADD USER TO DATABASE
         pw_hashed = bcrypt.hashpw(request.POST['pw'].encode(), bcrypt.gensalt())
         new_user_id = User.objects.create(first_name=request.POST['first_name'], last_name=request.POST['last_name'], email=request.POST['email'], pw=pw_hashed).id
